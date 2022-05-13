@@ -4,9 +4,9 @@
 
 ## Camunda Platform 8
 
-The most reason version is [Camunda Platform 8](https://github.com/camunda/camunda-platform). 
+The most recent version is [Camunda Platform 8](https://github.com/camunda/camunda-platform). 
 
-The core of Camunda Platform 8 is [source-available](https://camunda.com/legal/terms/cloud-terms-and-conditions/zeebe-license-overview-and-faq/), additional tools are free for non-production use. 
+The core of Camunda Platform 8 is [source-available](https://camunda.com/legal/terms/cloud-terms-and-conditions/zeebe-license-overview-and-faq/); additional tools are free for non-production use. 
 
 A free tier in [the Camunda SaaS offering](https://camunda.com/get-started) exists.
 
