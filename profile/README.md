@@ -10,12 +10,13 @@ The core of Camunda Platform 8 is [source-available](https://camunda.com/legal/t
 
 A free tier in [the Camunda SaaS offering](https://camunda.com/get-started) exists.
 
-Camunda Platform 8 is comprised of six components:
+Camunda Platform 8 is comprised of the following components:
 
 * [Zeebe](https://github.com/camunda/zeebe) - The cloud-native workflow and decision engine.
 * Operate - Manage, monitor, and troubleshoot your processes through Operate.
 * Optimize - Improve your processes by identifying constraints in your system with Optimize.
 * Tasklist - Use Tasklist to complete tasks which need human input.
+* [Connectors](https://github.com/camunda-community-hub/camunda-8-connectors/) - Integrate external systems with reusable, pre-defined building blocks.
 * Console - Configure and deploy clusters in SaaS with Console.
 * Web Modeler - Collaborate and model processes, deploy and start new instances all without leaving Camunda Platform 8.
 * [Desktop Modeler](https://github.com/camunda/camunda-modeler) - Model BPMN and DMN on your local developer machine using files that are part of your normal version control.
@@ -28,6 +29,7 @@ Camunda Platform 8 is comprised of six components:
 ## Camunda's open source (or source available) projects and efforts
 
 * [Zeebe](https://github.com/camunda/zeebe): The cloud-native workflow and decision engine.
+* [Connector SDK](https://github.com/camunda/connector-sdk): The development kit to create custom Connectors.
 * [Desktop Modeler](https://github.com/camunda/camunda-modeler): An integrated modeling solution for BPMN, DMN, and Forms based on bpmn.io.
 * [bpmn.io](https://github.com/bpmn-io): Web-based tooling for BPMN, DMN and Forms, see also https://bpmn.io/.
 * [Camunda Platform 7](https://github.com/camunda/camunda-bpm-platform): The very successfuly predecessor of Camunda Platform 8, which is still under full development.
