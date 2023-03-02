@@ -27,6 +27,7 @@ For releases and links to Self-Managed deployment and development options, visit
 
 * [Getting started guides](https://docs.camunda.io/docs/guides/) - Use case getting started guides for onboarding to Camunda Platform 8.
 * [Documentation](https://docs.camunda.io/) - Documentation for all components of Camunda Platform 8.
+* [Camunda Academy](https://academy.camunda.com/) - Training content for Camunda Platform, BPMN, DMN, and more.
 
 ## Camunda's open source (or source available) projects and efforts
 
