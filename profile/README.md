@@ -10,16 +10,19 @@ The core of Camunda Platform 8 is [source-available](https://camunda.com/legal/t
 
 A free tier in [the Camunda SaaS offering](https://camunda.com/get-started) exists.
 
-Camunda Platform 8 is comprised of the following components:
+[Camunda Platform 8](https://github.com/camunda/camunda) is comprised of the following components:
 
-* [Zeebe](https://github.com/camunda/zeebe) - The cloud-native workflow and decision engine.
+* Zeebe - The cloud-native workflow and decision engine.
 * Operate - Manage, monitor, and troubleshoot your processes through Operate.
 * Optimize - Improve your processes by identifying constraints in your system with Optimize.
 * Tasklist - Use Tasklist to complete tasks which need human input.
-* [Connectors](https://github.com/camunda-community-hub/camunda-8-connectors/) - Integrate external systems with reusable, pre-defined building blocks.
-* Console - Configure and deploy clusters in SaaS with Console.
-* Web Modeler - Collaborate and model processes, deploy and start new instances all without leaving Camunda Platform 8.
-* [Desktop Modeler](https://github.com/camunda/camunda-modeler) - Model BPMN and DMN on your local developer machine using files that are part of your normal version control.
+* Identity - Identity is the component within the Camunda 8 stack responsible for authentication and authorization.
+* (The following components are part of Camunda 8, but are served as individual components / via individual repositories):
+  * [Connectors](https://github.com/camunda-community-hub/camunda-8-connectors/) - Integrate external systems with reusable, pre-defined building blocks.
+  * Console - Configure and deploy clusters in SaaS with Console.
+  * Web Modeler - Collaborate and model processes, deploy and start new instances all without leaving Camunda Platform 8.
+  * [Desktop Modeler](https://github.com/camunda/camunda-modeler) - Model BPMN and DMN on your local developer machine using files that are part of your normal version control.
+  * [Camunda HELM Charts](https://github.com/camunda/camunda-platform-helm) - HELM Charts to set-up Camunda 8 Self-Managed in your k8s environment.
 
 For releases and links to Self-Managed deployment and development options, visit our [Camunda Platform repo](https://github.com/camunda/camunda-platform).
 
@@ -29,9 +32,9 @@ For releases and links to Self-Managed deployment and development options, visit
 * [Documentation](https://docs.camunda.io/) - Documentation for all components of Camunda Platform 8.
 * [Camunda Academy](https://academy.camunda.com/) - Training content for Camunda Platform, BPMN, DMN, and more.
 
-## Camunda's open source (or source available) projects and efforts
+## Camunda's open source and source available projects and efforts
 
-* [Zeebe](https://github.com/camunda/zeebe): The cloud-native workflow and decision engine.
+* [Camunda](https://github.com/camunda/camunda): The core Camunda components including Zeebe, Operate, Optimize, Tasklist, and Identity.
 * [Connector SDK](https://github.com/camunda/connector-sdk): The development kit to create custom Connectors.
 * [Desktop Modeler](https://github.com/camunda/camunda-modeler): An integrated modeling solution for BPMN, DMN, and Forms based on bpmn.io.
 * [bpmn.io](https://github.com/bpmn-io): Web-based tooling for BPMN, DMN and Forms, see also https://bpmn.io/.
