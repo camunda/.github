@@ -35,7 +35,7 @@ For releases and links to Self-Managed deployment and development options, visit
 ## Camunda's open source and source available projects and efforts
 
 * [Camunda](https://github.com/camunda/camunda): The core Camunda components including Zeebe, Operate, Optimize, Tasklist, and Identity.
-* [Connector SDK](https://github.com/camunda/connector-sdk): The development kit to create custom Connectors.
+* [Connectors](https://github.com/camunda/connectors): The Connector runtime and the  development kit to create custom Connectors.
 * [Desktop Modeler](https://github.com/camunda/camunda-modeler): An integrated modeling solution for BPMN, DMN, and Forms based on bpmn.io.
 * [bpmn.io](https://github.com/bpmn-io): Web-based tooling for BPMN, DMN and Forms, see also https://bpmn.io/.
 * [Camunda Platform 7](https://github.com/camunda/camunda-bpm-platform): The very successful predecessor of Camunda Platform 8, which is still under full development.
