@@ -14,17 +14,17 @@ Or pass flags directly:
 
 ```bash
 ./setup.sh --all              # configure everything
-./setup.sh --vscode --claude  # only VS Code and Claude Desktop
+./setup.sh --vscode --claude  # only VS Code and Claude Code
 ```
 
 ## What gets installed
 
-| MCP Server | Description | VS Code | Claude Desktop | JetBrains |
+| MCP Server | Description | VS Code | Claude Code | JetBrains |
 |---|---|:---:|:---:|:---:|
 | `camunda-docs` | Camunda 8 documentation search via [kapa.ai](https://camunda-docs.mcp.kapa.ai) | ✔ | ✔ | ✔ |
-| `github` | GitHub tools via Copilot MCP proxy | ✔ | — | — |
+| `github` | GitHub tools via [GitHub MCP Server](https://github.com/github/github-mcp-server) | ✔ | ✔ | — |
 
-> **Note:** The `github` MCP server requires GitHub Copilot and is only available in VS Code (where authentication is handled by the Copilot extension).
+> **Note:** In VS Code the `github` MCP server authenticates via the Copilot extension. In Claude Code it requires a [GitHub Personal Access Token](https://github.com/settings/personal-access-tokens/new).
 
 ## Target config paths
 
@@ -32,15 +32,15 @@ Or pass flags directly:
 |---|---|---|
 | **VS Code** | `~/Library/Application Support/Code/User/settings.json` (macOS) | Merges servers into the `mcp.servers` key |
 | | `~/.config/Code/User/settings.json` (Linux) | |
-| **Claude Desktop** | `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) | Merges servers into the `mcpServers` key |
-| | `~/.config/Claude/claude_desktop_config.json` (Linux) | |
+| **Claude Code** | n/a (uses `claude mcp add` CLI commands) | Adds servers via the Claude CLI with `--scope user` |
 | **JetBrains** | Configured via IDE Settings UI | Prints step-by-step instructions |
 
 The script **backs up** any existing config file before modifying it (`<file>.bak.<timestamp>`).
 
 ## Prerequisites
 
-- **jq** on `PATH` — install via `brew install jq` (macOS) or `apt install jq` (Linux)
+- **jq** on `PATH` — install via `brew install jq` (macOS) or `apt install jq` (Linux) (required for VS Code and JetBrains)
+- **claude** CLI on `PATH` (required for Claude Code) — install from [docs.anthropic.com](https://docs.anthropic.com/en/docs/claude-code)
 - No other dependencies
 
 ## CLI reference
@@ -50,7 +50,7 @@ Usage: setup.sh [OPTIONS]
 
 Options:
   --vscode      Configure VS Code
-  --claude      Configure Claude Desktop
+  --claude      Configure Claude Code
   --jetbrains   Configure JetBrains IDE (prints manual steps)
   --all         Configure all supported IDEs
   -h, --help    Show this help message
@@ -69,7 +69,7 @@ Options:
 
 | Problem | Fix |
 |---|---|
-| `jq is required` | Install jq (`brew install jq` / `apt install jq`) |
+| `jq is required` | Install jq (`brew install jq` / `apt install jq`) — needed for VS Code and JetBrains only |
 | VS Code comments lost after merge | VS Code settings.json must be valid JSON (not JSONC) for the merge to work. Back up is always created first. |
 | Changes not visible in IDE | Restart the IDE (or reload the VS Code window: `Cmd+Shift+P` → *Reload Window*). |
-| Claude Desktop config dir missing | Install and launch Claude Desktop at least once to create the config directory. |
+| Claude CLI not found | Install the Claude Code CLI from [docs.anthropic.com](https://docs.anthropic.com/en/docs/claude-code) |

@@ -75,18 +75,11 @@ vscode_settings() {
   esac
 }
 
-claude_config() {
-  case "$OS" in
-    macos)   echo "$HOME/Library/Application Support/Claude/claude_desktop_config.json" ;;
-    linux)   echo "$HOME/.config/Claude/claude_desktop_config.json" ;;
-    windows) echo "${APPDATA:-}/Claude/claude_desktop_config.json" ;;
-  esac
-}
-
 # ---------------------------------------------------------------------------
 # Installers
 # ---------------------------------------------------------------------------
 install_vscode() {
+  command -v jq &>/dev/null || { error "jq is required — install via: brew install jq (macOS) / apt install jq (Linux)"; return 1; }
   local target; target="$(vscode_settings)"
   [[ -z "$target" ]] && { error "Unsupported OS for VS Code"; return 1; }
   if $DRY_RUN; then
@@ -102,30 +95,65 @@ install_vscode() {
 }
 
 install_claude() {
-  local target; target="$(claude_config)"
-  [[ -z "$target" ]] && { error "Unsupported OS for Claude Desktop"; return 1; }
+  command -v claude &>/dev/null || { error "Claude CLI not found — install from https://docs.anthropic.com/en/docs/claude-code"; return 1; }
+
+  local pat="${GITHUB_PERSONAL_ACCESS_TOKEN:-}"
+
   if $DRY_RUN; then
-    info "Would merge into: $target"
-    [[ -f "$target" ]] || info "(file does not exist yet — would create)"
-    merge_json "$target" "$SCRIPT_DIR/claude-desktop.json" ""
+    info "Would run:"
+    info "  claude mcp add --transport http --scope user camunda-docs https://camunda-docs.mcp.kapa.ai"
+    info "  claude mcp add-json --scope user github '<config with GitHub PAT>'"
     return
   fi
-  mkdir -p "$(dirname "$target")"
-  [[ -f "$target" ]] || echo '{}' > "$target"
-  merge_json "$target" "$SCRIPT_DIR/claude-desktop.json" ""
-  success "Claude Desktop: $target"
+
+  # camunda-docs — no auth required
+  local add_output
+  if add_output=$(claude mcp add --transport http --scope user camunda-docs https://camunda-docs.mcp.kapa.ai 2>&1); then
+    success "Claude: camunda-docs added"
+  elif [[ "$add_output" == *"already exists"* ]]; then
+    info "Claude: camunda-docs already configured (skipped)"
+  else
+    error "Claude: camunda-docs failed — $add_output"; return 1
+  fi
+
+  # github — requires a GitHub Personal Access Token
+  if claude mcp get github 2>/dev/null | grep -q "githubcopilot"; then
+    info "Claude: github already configured (skipped)"
+  else
+    if [[ -z "$pat" ]]; then
+      read -rsp "GitHub Personal Access Token (for GitHub MCP server, Enter to skip): " pat
+      echo ""
+    fi
+    if [[ -n "$pat" ]]; then
+      if add_output=$(claude mcp add-json --scope user github \
+        "{\"type\":\"http\",\"url\":\"https://api.githubcopilot.com/mcp\",\"headers\":{\"Authorization\":\"Bearer $pat\"}}" 2>&1); then
+        success "Claude: github added"
+      elif [[ "$add_output" == *"already exists"* ]]; then
+        info "Claude: github already configured (skipped)"
+      else
+        error "Claude: github failed — $add_output"; return 1
+      fi
+    else
+      warn "Skipped github MCP server (no PAT provided)"
+    fi
+  fi
 }
 
 install_jetbrains() {
-  echo ""
-  info "JetBrains MCP is configured via the IDE UI:"
-  info "  Settings → Tools → AI Assistant → MCP Servers → +"
-  echo ""
-  jq -r '.mcpServers | to_entries[] | "    Name: \(.key)\n    URL:  \(.value.url)\n"' "$SCRIPT_DIR/jetbrains.json"
-  info "Or copy into your project:"
-  info "  cp $SCRIPT_DIR/jetbrains.json <project>/.idea/mcpServers.json"
-  echo ""
-  success "JetBrains: instructions printed above"
+  command -v jq &>/dev/null || { error "jq is required — install via: brew install jq (macOS) / apt install jq (Linux)"; return 1; }
+
+  # Copilot for IntelliJ – merge into ~/.config/github-copilot/intellij/mcp.json
+  local copilot_target="$HOME/.config/github-copilot/intellij/mcp.json"
+  if $DRY_RUN; then
+    info "Would merge into: $copilot_target"
+    [[ -f "$copilot_target" ]] || info "(file does not exist yet — would create)"
+    merge_json "$copilot_target" "$SCRIPT_DIR/vscode.json"
+  else
+    mkdir -p "$(dirname "$copilot_target")"
+    [[ -f "$copilot_target" ]] || echo '{}' > "$copilot_target"
+    merge_json "$copilot_target" "$SCRIPT_DIR/vscode.json"
+    success "JetBrains Copilot: $copilot_target"
+  fi
 }
 
 # ---------------------------------------------------------------------------
@@ -161,7 +189,7 @@ interactive() {
   echo -e "${BOLD}Camunda MCP Configuration Setup${NC}"
   echo ""
   echo "  1) VS Code"
-  echo "  2) Claude Desktop"
+  echo "  2) Claude Code"
   echo "  3) JetBrains (IntelliJ, WebStorm, …)"
   echo "  a) All    q) Quit"
   echo ""
@@ -184,8 +212,6 @@ interactive() {
 }
 
 main() {
-  command -v jq &>/dev/null || { error "jq is required — install via: brew install jq (macOS) / apt install jq (Linux)"; exit 1; }
-
   do_vscode=false; do_claude=false; do_jetbrains=false
   while [[ $# -gt 0 ]]; do
     case "$1" in
