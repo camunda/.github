@@ -1,0 +1,12 @@
+{
+  "servers": {
+    "github": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp/"
+    },
+    "camunda-docs": {
+      "type": "http",
+      "url": "https://camunda-docs.mcp.kapa.ai"
+    }
+  }
+}
