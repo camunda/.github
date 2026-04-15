@@ -19,12 +19,12 @@ Or pass flags directly:
 
 ## What gets installed
 
-| MCP Server | Description | VS Code | Claude Code | JetBrains |
-|---|---|:---:|:---:|:---:|
-| `camunda-docs` | Camunda 8 documentation search via [kapa.ai](https://camunda-docs.mcp.kapa.ai) | ✔ | ✔ | ✔ |
-| `github` | GitHub tools via [GitHub MCP Server](https://github.com/github/github-mcp-server) | ✔ | ✔ | — |
+| MCP Server | Description | VS Code | Claude Code | Claude Desktop | JetBrains |
+|---|---|:---:|:---:|:---:|:---:|
+| `camunda-docs` | Camunda 8 documentation search via [kapa.ai](https://camunda-docs.mcp.kapa.ai) | ✔ | ✔ | ✔ | ✔ |
+| `github` | GitHub tools via [GitHub MCP Server](https://github.com/github/github-mcp-server) | ✔ | ✔ | ✔ | — |
 
-> **Note:** In VS Code the `github` MCP server authenticates via the Copilot extension. In Claude Code it requires a [GitHub Personal Access Token](https://github.com/settings/personal-access-tokens/new).
+> **Note:** In VS Code the `github` MCP server authenticates via the Copilot extension. In Claude Code it requires a [GitHub Personal Access Token](https://github.com/settings/personal-access-tokens/new). In Claude Desktop, authenticate via Settings → Connectors.
 
 ## Target config paths
 
@@ -33,6 +33,7 @@ Or pass flags directly:
 | **VS Code** | `~/Library/Application Support/Code/User/settings.json` (macOS) | Merges servers into the `mcp.servers` key |
 | | `~/.config/Code/User/settings.json` (Linux) | |
 | **Claude Code** | n/a (uses `claude mcp add` CLI commands) | Adds servers via the Claude CLI with `--scope user` |
+| **Claude Desktop** | n/a (manual via Settings UI) | Prints step-by-step instructions |
 | **JetBrains** | Configured via IDE Settings UI | Prints step-by-step instructions |
 
 The script **backs up** any existing config file before modifying it (`<file>.bak.<timestamp>`).
@@ -49,19 +50,20 @@ The script **backs up** any existing config file before modifying it (`<file>.ba
 Usage: setup.sh [OPTIONS]
 
 Options:
-  --vscode      Configure VS Code
-  --claude      Configure Claude Code
-  --jetbrains   Configure JetBrains IDE (prints manual steps)
-  --all         Configure all supported IDEs
-  -h, --help    Show this help message
+  --vscode          Configure VS Code
+  --claude          Configure Claude Code
+  --claude-desktop  Configure Claude Desktop (prints manual steps)
+  --jetbrains       Configure JetBrains IDE (prints manual steps)
+  --all             Configure all supported IDEs
+  -h, --help        Show this help message
 ```
 
 ## Adding a new MCP server
 
 1. Add the server to each IDE-specific config file in this directory:
    - `vscode.json` — uses `servers` key with `"type": "http"`
-   - `claude-desktop.json` — uses `mcpServers` key
    - `jetbrains.json` — uses `mcpServers` key
+   - For Claude Desktop, update the manual instructions in `install_claude_desktop()` in `setup.sh`
 2. Update the table in this README.
 3. Commit and let others re-run `./setup.sh`.
 

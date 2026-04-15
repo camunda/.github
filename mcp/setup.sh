@@ -3,7 +3,7 @@
 # Camunda MCP Configuration Setup
 # Installs company-wide MCP server configurations into local IDE settings.
 #
-# Usage: ./setup.sh [--vscode] [--claude] [--jetbrains] [--all] [--dry-run]
+# Usage: ./setup.sh [--vscode] [--claude] [--claude-desktop] [--jetbrains] [--all] [--dry-run]
 #
 set -euo pipefail
 
@@ -139,6 +139,28 @@ install_claude() {
   fi
 }
 
+install_claude_desktop() {
+  echo ""
+  echo -e "${BOLD}Claude Desktop — manual setup:${NC}"
+  echo ""
+  echo "  1. Open Claude Desktop"
+  echo "  2. Go to Settings → Connectors"
+  echo "  3. Click \"Add custom connector\" and add:"
+  echo ""
+  echo -e "     ${BOLD}Camunda Docs${NC}"
+  echo "       Name:  camunda-docs"
+  echo "       URL:   https://camunda-docs.mcp.kapa.ai"
+  echo ""
+  echo -e "     ${BOLD}GitHub${NC}"
+  echo "       Name:  github"
+  echo "       URL:   https://api.githubcopilot.com/mcp/"
+  echo "       (Authenticate with your GitHub account when prompted)"
+  echo ""
+  success "Claude Desktop: follow the steps above to complete setup."
+  echo ""
+  read -rp "Press Enter to continue…"
+}
+
 install_jetbrains() {
   command -v jq &>/dev/null || { error "jq is required — install via: brew install jq (macOS) / apt install jq (Linux)"; return 1; }
 
@@ -161,7 +183,7 @@ install_jetbrains() {
 # ---------------------------------------------------------------------------
 usage() {
   cat << 'EOF'
-Usage: setup.sh [--vscode] [--claude] [--jetbrains] [--all] [--dry-run] [-h|--help]
+Usage: setup.sh [--vscode] [--claude] [--claude-desktop] [--jetbrains] [--all] [--dry-run] [-h|--help]
 
 Install Camunda MCP server configurations into your IDE(s).
 If no options are given, the script runs interactively.
@@ -172,9 +194,10 @@ EOF
 
 run_selected() {
   local any=false
-  if $do_vscode;    then any=true; install_vscode;    fi
-  if $do_claude;    then any=true; install_claude;    fi
-  if $do_jetbrains; then any=true; install_jetbrains; fi
+  if $do_vscode;         then any=true; install_vscode;         fi
+  if $do_claude;         then any=true; install_claude;         fi
+  if $do_claude_desktop; then any=true; install_claude_desktop; fi
+  if $do_jetbrains;      then any=true; install_jetbrains;      fi
   $any || { error "No IDEs selected"; return 1; }
   echo ""
   if $DRY_RUN; then
@@ -190,20 +213,21 @@ interactive() {
   echo ""
   echo "  1) VS Code"
   echo "  2) Claude Code"
-  echo "  3) JetBrains (IntelliJ, WebStorm, …)"
+  echo "  3) Claude Desktop"
+  echo "  4) JetBrains (IntelliJ, WebStorm, …)"
   echo "  a) All    q) Quit"
   echo ""
   read -rp "Choose (comma-separated, e.g. 1,3): " choice
   [[ "$choice" == [qQ] ]] && exit 0
 
-  do_vscode=false; do_claude=false; do_jetbrains=false
+  do_vscode=false; do_claude=false; do_claude_desktop=false; do_jetbrains=false
   if [[ "$choice" == [aA] ]]; then
-    do_vscode=true; do_claude=true; do_jetbrains=true
+    do_vscode=true; do_claude=true; do_claude_desktop=true; do_jetbrains=true
   else
     IFS=',' read -ra sel <<< "$choice"
     for s in "${sel[@]}"; do
       case "$(echo "$s" | tr -d ' ')" in
-        1) do_vscode=true ;; 2) do_claude=true ;; 3) do_jetbrains=true ;;
+        1) do_vscode=true ;; 2) do_claude=true ;; 3) do_claude_desktop=true ;; 4) do_jetbrains=true ;;
         *) warn "Unknown: $s" ;;
       esac
     done
@@ -212,13 +236,14 @@ interactive() {
 }
 
 main() {
-  do_vscode=false; do_claude=false; do_jetbrains=false
+  do_vscode=false; do_claude=false; do_claude_desktop=false; do_jetbrains=false
   while [[ $# -gt 0 ]]; do
     case "$1" in
-      --vscode)    do_vscode=true ;;
-      --claude)    do_claude=true ;;
-      --jetbrains) do_jetbrains=true ;;
-      --all)       do_vscode=true; do_claude=true; do_jetbrains=true ;;
+      --vscode)         do_vscode=true ;;
+      --claude)         do_claude=true ;;
+      --claude-desktop) do_claude_desktop=true ;;
+      --jetbrains)      do_jetbrains=true ;;
+      --all)            do_vscode=true; do_claude=true; do_claude_desktop=true; do_jetbrains=true ;;
       --dry-run)   DRY_RUN=true ;;
       -h|--help)   usage; exit 0 ;;
       *)           error "Unknown option: $1"; usage; exit 1 ;;
@@ -227,7 +252,7 @@ main() {
   done
 
   # No IDE selected — go interactive
-  if ! $do_vscode && ! $do_claude && ! $do_jetbrains; then
+  if ! $do_vscode && ! $do_claude && ! $do_claude_desktop && ! $do_jetbrains; then
     interactive; exit 0
   fi
 
