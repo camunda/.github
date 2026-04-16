@@ -20,7 +20,7 @@ For each change, cross-check against the following references when the condition
 
 | When to Apply | What to Apply | How to Access |
 |---|---|---|
-| Structural or foundational changes | Ensure that changes conform with the [Architecture principles](https://github.com/camunda/product-development/tree/add-architecture-principles/architecture/principles) | Use the `github` MCP server to access the principles |
+| Structural or foundational changes | Ensure that changes conform with the [Architecture principles](https://github.com/camunda/product-development/tree/main/architecture/principles) | Use the `github` MCP server to access the principles |
 | Any change needing Camunda domain knowledge | Gather required knowledge from the Camunda 8 Docs | Use the `camunda-docs` MCP server |
 
 ## Build Standards
