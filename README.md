@@ -12,13 +12,22 @@
 
 [`AGENTS.md`](AGENTS.md) provides development instructions for AI coding agents working in Camunda repositories. It defines how agents should classify changes (linear, structural, foundational), plan before implementing, and cross-check against key references such as architecture principles and Camunda 8 documentation.
 
-### MCP Server Configurations (`mcp/`)
+### Developer Setup
 
-The [`mcp/`](mcp/) directory contains company-wide [MCP (Model Context Protocol)](https://modelcontextprotocol.io/) server configurations and a setup script for VS Code, Claude Desktop, and JetBrains IDEs. It provides access to:
+Set up your local environment for AI-assisted development in two steps:
 
-- **`camunda-docs`** — Camunda 8 documentation search
-- **`github`** — GitHub tools via Copilot MCP proxy (VS Code only)
+1. **MCP servers** — give agents access to Camunda docs and GitHub tools
+   ```bash
+   cd mcp && ./setup.sh
+   ```
+   See [`mcp/README.md`](mcp/README.md) for details.
 
-Run `mcp/setup.sh` to install the configurations into your local IDE. See [`mcp/README.md`](mcp/README.md) for details.
+2. **Agent skills** — give agents Camunda-specific capabilities
+   ```bash
+   cd skills && ./setup.sh
+   ```
+   See [`skills/README.md`](skills/README.md) for details.
+
+### Onboarding a Repository
 
 Follow the instructions in https://github.com/camunda/ai-first-template for how to onboard your repo for using this AI-First framework.
