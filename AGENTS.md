@@ -22,6 +22,7 @@ For each change, cross-check against the following references when the condition
 |---|---|
 | Structural or foundational changes | Ensure that changes conform with the [Architecture principles](https://github.com/camunda/product-development/tree/main/architecture/principles). Use the `check-architecture-principles` skill. |
 | Any change needing Camunda domain knowledge | Gather required knowledge from the Camunda 8 Docs. Use the `check-camunda-docs` skill. |
+| Building, modifying, or reviewing user-facing UI | Apply Camunda brand guidelines (colors, typography, writing style, layout). Use the `check-ui-design-guidance` skill. |
 
 ## Tooling Preconditions
 
