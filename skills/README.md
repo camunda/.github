@@ -25,6 +25,7 @@ If you run `./setup.sh` from inside a git checkout that contains these skills, t
 |---|---|
 | `check-architecture-principles` | Validates structural/foundational changes against Camunda architecture principles |
 | `check-camunda-docs` | Searches Camunda 8 docs for domain knowledge needed during implementation |
+| `check-ui-design-guidance` | Provides Camunda brand/UI design guidance and validates UI against it |
 
 ## Prerequisites
 
