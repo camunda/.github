@@ -44,9 +44,9 @@ merge_json() {
     source=$(jq -n --argjson s "$source" --arg k "$wrapper_key" '{($k): $s}')
   fi
 
-  # Deep merge and write
+  # Deep merge and write (use printf pipe to avoid process-substitution issues with jq 1.7+)
   local result
-  result=$(jq -s '.[0] * .[1]' <(echo "$target") <(echo "$source"))
+  result=$(printf '%s\n%s\n' "$target" "$source" | jq -s '.[0] * .[1]')
 
   if $DRY_RUN; then
     echo "$result" | jq '(.mcp // .mcpServers // .)'
@@ -145,16 +145,15 @@ install_claude_desktop() {
   echo ""
   echo "  1. Open Claude Desktop"
   echo "  2. Go to Settings → Connectors"
-  echo "  3. Click \"Add custom connector\" and add:"
+  echo "  3. The following connectors already exist in your organization."
+  echo "     Click \"Connect\" next to each one to enable it:"
   echo ""
-  echo -e "     ${BOLD}Camunda Docs${NC}"
-  echo "       Name:  camunda-docs"
-  echo "       URL:   https://camunda-docs.mcp.kapa.ai"
+  echo -e "     ${BOLD}Camunda Docs${NC}  (camunda-docs)"
   echo ""
-  echo -e "     ${BOLD}GitHub${NC}"
-  echo "       Name:  github"
-  echo "       URL:   https://api.githubcopilot.com/mcp/"
+  echo -e "     ${BOLD}GitHub${NC}  (github)"
   echo "       (Authenticate with your GitHub account when prompted)"
+  echo ""
+  echo "  No custom connector setup or organization owner contact is needed."
   echo ""
   success "Claude Desktop: follow the steps above to complete setup."
   echo ""
