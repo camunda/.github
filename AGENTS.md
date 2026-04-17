@@ -27,7 +27,7 @@ For each change, cross-check against the following references when the condition
 
 At the start of every session, verify the following:
 
-1. **GitHub CLI (`gh`)** — run `gh auth status`. If it fails or is not installed, notify the engineer and point them to https://cli.github.com. `gh` must be installed and authenticated to access Camunda's private repositories. If `gh` is not available or not authenticated, fall back to the `github` MCP server for repository access.
+1. **GitHub CLI (`gh`)** — run `gh auth status`. If it fails or is not installed, notify the engineer and point them to https://cli.github.com. `gh` must be installed and authenticated to access Camunda's private repositories. If `gh` is not available or not authenticated (e.g., 404/invalid token in web-agent sessions), fall back to the `github` MCP server for repository access.
 2. **Skill freshness** — run `gh skill update` to check for outdated skills. If any skill has a pending update, suggest running `gh skill update --all` before proceeding.
 
 ## Build Standards
