@@ -146,7 +146,7 @@ interactive() {
     echo "    - $s"
   done
   echo ""
-  echo "  1) GitHub Copilot / VS Code (default)"
+  echo "  1) GitHub Copilot / VSCode (default)"
   echo "  2) Claude Code"
   echo "  3) Cursor"
   echo "  4) Codex"
