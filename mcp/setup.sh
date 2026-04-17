@@ -3,7 +3,7 @@
 # Camunda MCP Configuration Setup
 # Installs company-wide MCP server configurations into local IDE settings.
 #
-# Usage: ./setup.sh [--vscode] [--claude] [--claude-desktop] [--jetbrains] [--all] [--dry-run]
+# Usage: ./setup.sh [--vscode] [--claude] [--claude-desktop] [--gh-copilot] [--jetbrains] [--all] [--dry-run]
 #
 set -euo pipefail
 
@@ -28,11 +28,6 @@ DRY_RUN=false
 # ---------------------------------------------------------------------------
 merge_json() {
   local target_path="$1" source_path="$2" wrapper_key="${3:-}"
-
-  # Back up existing file
-  if [[ -f "$target_path" ]]; then
-    cp -p "$target_path" "${target_path}.bak.$(date +%Y%m%d_%H%M%S)"
-  fi
 
   local target
   if [[ -f "$target_path" ]] && [[ -s "$target_path" ]]; then
@@ -60,6 +55,11 @@ merge_json() {
   if $DRY_RUN; then
     echo "$result" | jq '(.mcp // .mcpServers // .)'
     return
+  fi
+
+  # Back up existing file before writing
+  if [[ -f "$target_path" ]]; then
+    cp -p "$target_path" "${target_path}.bak.$(date +%Y%m%d_%H%M%S)"
   fi
 
   mkdir -p "$(dirname "$target_path")"
@@ -169,6 +169,24 @@ install_claude_desktop() {
   read -rp "Press Enter to continue…"
 }
 
+install_gh_copilot() {
+  command -v gh &>/dev/null || { error "GitHub CLI not found — install from https://cli.github.com"; return 1; }
+  gh copilot --help &>/dev/null || { error "GitHub Copilot CLI not found — install via: gh extension install github/gh-copilot"; return 1; }
+  command -v jq &>/dev/null || { error "jq is required — install via: brew install jq (macOS) / apt install jq (Linux)"; return 1; }
+
+  local target="$HOME/.copilot/mcp-config.json"
+  if $DRY_RUN; then
+    info "Would merge into: $target"
+    [[ -f "$target" ]] || info "(file does not exist yet — would create)"
+    merge_json "$target" "$SCRIPT_DIR/gh-copilot.json"
+    return
+  fi
+  mkdir -p "$(dirname "$target")"
+  [[ -f "$target" ]] || echo '{}' > "$target"
+  merge_json "$target" "$SCRIPT_DIR/gh-copilot.json"
+  success "GitHub Copilot CLI: $target"
+}
+
 install_jetbrains() {
   command -v jq &>/dev/null || { error "jq is required — install via: brew install jq (macOS) / apt install jq (Linux)"; return 1; }
 
@@ -191,7 +209,7 @@ install_jetbrains() {
 # ---------------------------------------------------------------------------
 usage() {
   cat << 'EOF'
-Usage: setup.sh [--vscode] [--claude] [--claude-desktop] [--jetbrains] [--all] [--dry-run] [-h|--help]
+Usage: setup.sh [--vscode] [--claude] [--claude-desktop] [--gh-copilot] [--jetbrains] [--all] [--dry-run] [-h|--help]
 
 Install Camunda MCP server configurations into your IDE(s).
 If no options are given, the script runs interactively.
@@ -205,6 +223,7 @@ run_selected() {
   if $do_vscode;         then any=true; install_vscode;         fi
   if $do_claude;         then any=true; install_claude;         fi
   if $do_claude_desktop; then any=true; install_claude_desktop; fi
+  if $do_gh_copilot;     then any=true; install_gh_copilot;     fi
   if $do_jetbrains;      then any=true; install_jetbrains;      fi
   $any || { error "No IDEs selected"; return 1; }
   echo ""
@@ -222,20 +241,21 @@ interactive() {
   echo "  1) VS Code"
   echo "  2) Claude Code"
   echo "  3) Claude Desktop"
-  echo "  4) JetBrains (IntelliJ, WebStorm, …)"
+  echo "  4) GitHub Copilot CLI (gh copilot)"
+  echo "  5) JetBrains (IntelliJ, WebStorm, …)"
   echo "  a) All    q) Quit"
   echo ""
   read -rp "Choose (comma-separated, e.g. 1,3): " choice
   [[ "$choice" == [qQ] ]] && exit 0
 
-  do_vscode=false; do_claude=false; do_claude_desktop=false; do_jetbrains=false
+  do_vscode=false; do_claude=false; do_claude_desktop=false; do_gh_copilot=false; do_jetbrains=false
   if [[ "$choice" == [aA] ]]; then
-    do_vscode=true; do_claude=true; do_claude_desktop=true; do_jetbrains=true
+    do_vscode=true; do_claude=true; do_claude_desktop=true; do_gh_copilot=true; do_jetbrains=true
   else
     IFS=',' read -ra sel <<< "$choice"
     for s in "${sel[@]}"; do
       case "$(echo "$s" | tr -d ' ')" in
-        1) do_vscode=true ;; 2) do_claude=true ;; 3) do_claude_desktop=true ;; 4) do_jetbrains=true ;;
+        1) do_vscode=true ;; 2) do_claude=true ;; 3) do_claude_desktop=true ;; 4) do_gh_copilot=true ;; 5) do_jetbrains=true ;;
         *) warn "Unknown: $s" ;;
       esac
     done
@@ -244,14 +264,15 @@ interactive() {
 }
 
 main() {
-  do_vscode=false; do_claude=false; do_claude_desktop=false; do_jetbrains=false
+  do_vscode=false; do_claude=false; do_claude_desktop=false; do_gh_copilot=false; do_jetbrains=false
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --vscode)         do_vscode=true ;;
       --claude)         do_claude=true ;;
       --claude-desktop) do_claude_desktop=true ;;
+      --gh-copilot)     do_gh_copilot=true ;;
       --jetbrains)      do_jetbrains=true ;;
-      --all)            do_vscode=true; do_claude=true; do_claude_desktop=true; do_jetbrains=true ;;
+      --all)            do_vscode=true; do_claude=true; do_claude_desktop=true; do_gh_copilot=true; do_jetbrains=true ;;
       --dry-run)   DRY_RUN=true ;;
       -h|--help)   usage; exit 0 ;;
       *)           error "Unknown option: $1"; usage; exit 1 ;;
@@ -260,7 +281,7 @@ main() {
   done
 
   # No IDE selected — go interactive
-  if ! $do_vscode && ! $do_claude && ! $do_claude_desktop && ! $do_jetbrains; then
+  if ! $do_vscode && ! $do_claude && ! $do_claude_desktop && ! $do_gh_copilot && ! $do_jetbrains; then
     interactive; exit 0
   fi
 
