@@ -18,10 +18,17 @@ Before implementing every change:
 
 For each change, cross-check against the following references when the condition applies:
 
-| When to Apply | What to Apply | How to Access |
-|---|---|---|
-| Structural or foundational changes | Ensure that changes conform with the [Architecture principles](https://github.com/camunda/product-development/tree/main/architecture/principles) | Use the `github` MCP server to access the principles |
-| Any change needing Camunda domain knowledge | Gather required knowledge from the Camunda 8 Docs | Use the `camunda-docs` MCP server |
+| When to Apply | What to Apply |
+|---|---|
+| Structural or foundational changes | Ensure that changes conform with the [Architecture principles](https://github.com/camunda/product-development/tree/main/architecture/principles). Use the `check-architecture-principles` skill. |
+| Any change needing Camunda domain knowledge | Gather required knowledge from the Camunda 8 Docs. Use the `check-camunda-docs` skill. |
+
+## Tooling Preconditions
+
+At the start of every session, verify the following:
+
+1. **GitHub CLI (`gh`)** — run `gh auth status`. If it fails or is not installed, notify the engineer and point them to https://cli.github.com. `gh` must be installed and authenticated to access Camunda's private repositories.
+2. **Skill freshness** — run `gh skill update` to check for outdated skills. If any skill has a pending update, suggest running `gh skill update --all` before proceeding.
 
 ## Build Standards
 
