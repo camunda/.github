@@ -35,7 +35,16 @@ merge_json() {
   fi
 
   local target
-  target=$(if [[ -f "$target_path" ]] && [[ -s "$target_path" ]]; then cat "$target_path"; else echo '{}'; fi)
+  if [[ -f "$target_path" ]] && [[ -s "$target_path" ]]; then
+    if jq empty "$target_path" 2>/dev/null; then
+      target=$(cat "$target_path")
+    else
+      warn "$(basename "$target_path") contains invalid JSON (possibly JSONC with comments) — ignoring existing content"
+      target='{}'
+    fi
+  else
+    target='{}'
+  fi
   local source
   source=$(cat "$source_path")
 
