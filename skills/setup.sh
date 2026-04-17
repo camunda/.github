@@ -9,6 +9,8 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO="camunda/.github"
+SOURCE="$REPO"
+SOURCE_IS_LOCAL=false
 
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -27,11 +29,30 @@ DRY_RUN=false
 # Discover skills — each subdirectory containing a SKILL.md
 # ---------------------------------------------------------------------------
 discover_skills() {
+  local base_dir="${1:-$SCRIPT_DIR}"
   local skills=()
-  for dir in "$SCRIPT_DIR"/*/; do
+  for dir in "$base_dir"/*/; do
+    [[ -f "$dir/SKILL.md" ]] && skills+=("$(basename "$dir")")
+  done
+  for dir in "$base_dir"/skills/*/; do
     [[ -f "$dir/SKILL.md" ]] && skills+=("$(basename "$dir")")
   done
   echo "${skills[@]}"
+}
+
+# Prefer local checkout when running inside a git worktree with skills.
+auto_detect_local_source() {
+  local repo_root
+  repo_root=$(git -C "$SCRIPT_DIR" rev-parse --show-toplevel 2>/dev/null || true)
+  [[ -n "$repo_root" ]] || return 1
+
+  local found
+  found="$(discover_skills "$repo_root")"
+  [[ -n "$found" ]] || return 1
+
+  SOURCE="$repo_root"
+  SOURCE_IS_LOCAL=true
+  return 0
 }
 
 # ---------------------------------------------------------------------------
@@ -39,14 +60,17 @@ discover_skills() {
 # ---------------------------------------------------------------------------
 install_skill() {
   local skill="$1" agent_flag="${2:-}"
+  local cmd=(gh skill install "$SOURCE" "$skill")
+  $SOURCE_IS_LOCAL && cmd+=(--from-local)
+  [[ -n "$agent_flag" ]] && cmd+=($agent_flag)
 
   if $DRY_RUN; then
-    info "Would run: gh skill install $REPO $skill $agent_flag"
+    info "Would run: ${cmd[*]}"
     return
   fi
 
   local output
-  if output=$(gh skill install "$REPO" "$skill" $agent_flag 2>&1); then
+  if output=$("${cmd[@]}" 2>&1); then
     success "$skill installed${agent_flag:+ ($agent_flag)}"
   elif [[ "$output" == *"already"* ]]; then
     info "$skill already installed${agent_flag:+ ($agent_flag)} (skipped)"
@@ -87,7 +111,9 @@ interactive() {
   echo ""
 
   local skills
-  read -ra skills <<< "$(discover_skills)"
+  local discovery_root="$SCRIPT_DIR"
+  $SOURCE_IS_LOCAL && discovery_root="$SOURCE"
+  read -ra skills <<< "$(discover_skills "$discovery_root")"
   echo "  Skills to install:"
   for s in "${skills[@]}"; do
     echo "    - $s"
@@ -163,8 +189,20 @@ main() {
     shift
   done
 
+  if ! $SOURCE_IS_LOCAL; then
+    auto_detect_local_source || true
+  fi
+
+  if $SOURCE_IS_LOCAL; then
+    [[ -d "$SOURCE" ]] || { error "Local source directory not found: $SOURCE"; exit 1; }
+  fi
+
   local skills
-  read -ra skills <<< "$(discover_skills)"
+  if $SOURCE_IS_LOCAL; then
+    read -ra skills <<< "$(discover_skills "$SOURCE")"
+  else
+    read -ra skills <<< "$(discover_skills "$SCRIPT_DIR")"
+  fi
 
   if [[ ${#skills[@]} -eq 0 ]]; then
     error "No skills found in $SCRIPT_DIR"; exit 1
