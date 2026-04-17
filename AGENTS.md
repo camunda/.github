@@ -22,6 +22,7 @@ For each change, cross-check against the following references when the condition
 |---|---|
 | Structural or foundational changes | Ensure that changes conform with the [Architecture principles](https://github.com/camunda/product-development/tree/main/architecture/principles). Use the `check-architecture-principles` skill. |
 | Any change needing Camunda domain knowledge | Gather required knowledge from the Camunda 8 Docs. Use the `check-camunda-docs` skill. |
+| User-visible changes that need public documentation | Write the docs and raise (or update) a PR against `camunda/camunda-docs`. Use the `write-docs` skill. |
 
 ## Tooling Preconditions
 
