@@ -17,6 +17,8 @@ Or pass flags directly:
 ./setup.sh --all                  # all supported agents
 ```
 
+If you run `./setup.sh` from inside a git checkout that contains these skills, the script automatically installs from that local checkout.
+
 ## Available skills
 
 | Skill | Description |
@@ -31,7 +33,7 @@ Or pass flags directly:
 
 ## Keeping skills up to date
 
-Skills are checked for freshness by the agent at the start of every session (see [AGENTS.md](../AGENTS.md#skill-freshness)). When updates are available, the agent will nudge you to run:
+Skills are checked for freshness by the agent at the start of every session (see [AGENTS.md](../AGENTS.md#tooling-preconditions)). When updates are available, the agent will nudge you to run:
 
 ```bash
 gh skill update --all
