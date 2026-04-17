@@ -39,17 +39,8 @@ merge_json() {
     if jq empty "$target_path" 2>/dev/null; then
       target=$(cat "$target_path")
     else
-      # File may be JSONC (JSON with comments). Strip single-line // comments and retry,
-      # so any user-added servers are preserved in the merge.
-      local stripped
-      stripped=$(sed '/^[[:space:]]*\/\//d' "$target_path")
-      if echo "$stripped" | jq empty 2>/dev/null; then
-        warn "$(basename "$target_path") contained JSONC comments — stripping comments and merging existing content"
-        target="$stripped"
-      else
-        warn "$(basename "$target_path") contains invalid JSON — ignoring existing content (original backed up)"
-        target='{}'
-      fi
+      warn "$(basename "$target_path") contains invalid JSON (possibly JSONC with comments) — ignoring existing content"
+      target='{}'
     fi
   else
     target='{}'
