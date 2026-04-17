@@ -192,26 +192,6 @@ interactive() {
 }
 
 main() {
-  command -v gh &>/dev/null || { error "GitHub CLI (gh) is required — install from https://cli.github.com"; exit 1; }
-
-  # gh skill requires v2.90.0+
-  local gh_version
-  gh_version=$(gh --version | head -1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' || true)
-  local required="2.90.0"
-
-  if [[ -z "$gh_version" || ! "$gh_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-    error "Could not determine GitHub CLI version"
-    info "Expected 'gh --version' to contain a semantic version like X.Y.Z"
-    info "See https://cli.github.com"
-    exit 1
-  fi
-
-  if ! version_ge "$gh_version" "$required"; then
-    error "GitHub CLI v${required}+ is required for 'gh skill' (found v${gh_version})"
-    info "Upgrade with: brew upgrade gh (macOS) or see https://cli.github.com"
-    exit 1
-  fi
-
   local agents=()
   local install_all=false
 
@@ -233,6 +213,26 @@ main() {
     esac
     shift
   done
+
+  command -v gh &>/dev/null || { error "GitHub CLI (gh) is required — install from https://cli.github.com"; exit 1; }
+
+  # gh skill requires v2.90.0+
+  local gh_version
+  gh_version=$(gh --version | head -1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' || true)
+  local required="2.90.0"
+
+  if [[ -z "$gh_version" || ! "$gh_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    error "Could not determine GitHub CLI version"
+    info "Expected 'gh --version' to contain a semantic version like X.Y.Z"
+    info "See https://cli.github.com"
+    exit 1
+  fi
+
+  if ! version_ge "$gh_version" "$required"; then
+    error "GitHub CLI v${required}+ is required for 'gh skill' (found v${gh_version})"
+    info "Upgrade with: brew upgrade gh (macOS) or see https://cli.github.com"
+    exit 1
+  fi
 
   if ! $SOURCE_IS_LOCAL; then
     auto_detect_local_source || true
