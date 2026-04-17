@@ -29,11 +29,6 @@ DRY_RUN=false
 merge_json() {
   local target_path="$1" source_path="$2" wrapper_key="${3:-}"
 
-  # Back up existing file
-  if [[ -f "$target_path" ]]; then
-    cp -p "$target_path" "${target_path}.bak.$(date +%Y%m%d_%H%M%S)"
-  fi
-
   local target
   target=$(if [[ -f "$target_path" ]] && [[ -s "$target_path" ]]; then cat "$target_path"; else echo '{}'; fi)
   local source
@@ -51,6 +46,11 @@ merge_json() {
   if $DRY_RUN; then
     echo "$result" | jq '(.mcp // .mcpServers // .)'
     return
+  fi
+
+  # Back up existing file before writing
+  if [[ -f "$target_path" ]]; then
+    cp -p "$target_path" "${target_path}.bak.$(date +%Y%m%d_%H%M%S)"
   fi
 
   mkdir -p "$(dirname "$target_path")"
