@@ -25,6 +25,26 @@ error()   { echo -e "${RED}✘${NC} $*" >&2; }
 
 DRY_RUN=false
 
+SUPPORTED_AGENTS="claude-code cursor codex gemini"
+
+# ---------------------------------------------------------------------------
+# Portable semver comparison (sort -V is not available on macOS by default)
+# ---------------------------------------------------------------------------
+version_ge() {
+  local a="$1" b="$2"
+  local a_major a_minor a_patch b_major b_minor b_patch
+
+  IFS='.' read -r a_major a_minor a_patch <<< "$a"
+  IFS='.' read -r b_major b_minor b_patch <<< "$b"
+
+  (( a_major > b_major )) && return 0
+  (( a_major < b_major )) && return 1
+  (( a_minor > b_minor )) && return 0
+  (( a_minor < b_minor )) && return 1
+  (( a_patch >= b_patch )) && return 0
+  return 1
+}
+
 # ---------------------------------------------------------------------------
 # Discover skills — each subdirectory containing a SKILL.md
 # ---------------------------------------------------------------------------
@@ -57,12 +77,19 @@ auto_detect_local_source() {
 
 # ---------------------------------------------------------------------------
 # Install a single skill
+# Usage: install_skill <skill_name> [agent_name]
+#   If agent_name is empty, installs for GitHub Copilot (default).
 # ---------------------------------------------------------------------------
 install_skill() {
-  local skill="$1" agent_flag="${2:-}"
+  local skill="$1"
+  local agent="${2:-}"
+  local label="${agent:-github-copilot}"
+
   local cmd=(gh skill install "$SOURCE" "$skill")
   $SOURCE_IS_LOCAL && cmd+=(--from-local)
-  [[ -n "$agent_flag" ]] && cmd+=($agent_flag)
+  if [[ -n "$agent" ]]; then
+    cmd+=(--agent "$agent")
+  fi
 
   if $DRY_RUN; then
     info "Would run: ${cmd[*]}"
@@ -71,11 +98,11 @@ install_skill() {
 
   local output
   if output=$("${cmd[@]}" 2>&1); then
-    success "$skill installed${agent_flag:+ ($agent_flag)}"
+    success "$skill installed ($label)"
   elif [[ "$output" == *"already"* ]]; then
-    info "$skill already installed${agent_flag:+ ($agent_flag)} (skipped)"
+    info "$skill already installed ($label) (skipped)"
   else
-    error "$skill failed — $output"
+    error "$skill failed ($label) — $output"
     return 1
   fi
 }
@@ -119,7 +146,7 @@ interactive() {
     echo "    - $s"
   done
   echo ""
-  echo "  1) GitHub Copilot (default)"
+  echo "  1) GitHub Copilot / VS Code (default)"
   echo "  2) Claude Code"
   echo "  3) Cursor"
   echo "  4) Codex"
@@ -127,28 +154,32 @@ interactive() {
   echo "  a) All    q) Quit"
   echo ""
   read -rp "Choose agents (comma-separated, e.g. 1,2): " choice
+  # Default to Copilot on empty input
+  if [[ -z "${choice//[[:space:]]/}" ]]; then
+    choice="1"
+  fi
   [[ "$choice" == [qQ] ]] && exit 0
 
-  local agent_flags=()
+  local agents=()
   if [[ "$choice" == [aA] ]]; then
-    agent_flags=("" "--agent claude-code" "--agent cursor" "--agent codex" "--agent gemini")
+    agents=("" "claude-code" "cursor" "codex" "gemini")
   else
     IFS=',' read -ra sel <<< "$choice"
     for s in "${sel[@]}"; do
       case "$(echo "$s" | tr -d ' ')" in
-        1) agent_flags+=("") ;;
-        2) agent_flags+=("--agent claude-code") ;;
-        3) agent_flags+=("--agent cursor") ;;
-        4) agent_flags+=("--agent codex") ;;
-        5) agent_flags+=("--agent gemini") ;;
+        1) agents+=("") ;;
+        2) agents+=("claude-code") ;;
+        3) agents+=("cursor") ;;
+        4) agents+=("codex") ;;
+        5) agents+=("gemini") ;;
         *) warn "Unknown: $s" ;;
       esac
     done
   fi
 
-  for flag in "${agent_flags[@]}"; do
+  for agent in "${agents[@]}"; do
     for skill in "${skills[@]}"; do
-      install_skill "$skill" "$flag"
+      install_skill "$skill" "$agent"
     done
   done
 
@@ -165,22 +196,36 @@ main() {
 
   # gh skill requires v2.90.0+
   local gh_version
-  gh_version=$(gh --version | head -1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+  gh_version=$(gh --version | head -1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' || true)
   local required="2.90.0"
-  if printf '%s\n%s\n' "$required" "$gh_version" | sort -V -C 2>/dev/null; then
-    : # version is sufficient
-  else
+
+  if [[ -z "$gh_version" || ! "$gh_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    error "Could not determine GitHub CLI version"
+    info "Expected 'gh --version' to contain a semantic version like X.Y.Z"
+    info "See https://cli.github.com"
+    exit 1
+  fi
+
+  if ! version_ge "$gh_version" "$required"; then
     error "GitHub CLI v${required}+ is required for 'gh skill' (found v${gh_version})"
     info "Upgrade with: brew upgrade gh (macOS) or see https://cli.github.com"
     exit 1
   fi
 
-  local agent_flags=()
+  local agents=()
   local install_all=false
 
   while [[ $# -gt 0 ]]; do
     case "$1" in
-      --agent)    shift; agent_flags+=("--agent $1") ;;
+      --agent)
+        shift
+        if [[ $# -eq 0 ]]; then
+          error "Missing value for --agent"
+          usage
+          exit 1
+        fi
+        agents+=("$1")
+        ;;
       --all)      install_all=true ;;
       --dry-run)  DRY_RUN=true ;;
       -h|--help)  usage; exit 0 ;;
@@ -208,21 +253,21 @@ main() {
     error "No skills found in $SCRIPT_DIR"; exit 1
   fi
 
-  # No flags — go interactive
-  if ! $install_all && [[ ${#agent_flags[@]} -eq 0 ]]; then
+  # No agents or --all specified and not dry-run-only — go interactive
+  if ! $install_all && [[ ${#agents[@]} -eq 0 ]] && ! $DRY_RUN; then
     interactive; exit 0
   fi
 
   if $install_all; then
-    agent_flags=("" "--agent claude-code" "--agent cursor" "--agent codex" "--agent gemini")
+    agents=("" "claude-code" "cursor" "codex" "gemini")
   fi
 
-  # Default to Copilot if no agent specified
-  [[ ${#agent_flags[@]} -eq 0 ]] && agent_flags+=("")
+  # Default to Copilot if only --dry-run was passed
+  [[ ${#agents[@]} -eq 0 ]] && agents+=("")
 
-  for flag in "${agent_flags[@]}"; do
+  for agent in "${agents[@]}"; do
     for skill in "${skills[@]}"; do
-      install_skill "$skill" "$flag"
+      install_skill "$skill" "$agent"
     done
   done
 

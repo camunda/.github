@@ -21,7 +21,7 @@ Do not use for linear changes (flags, constants, simple feature tweaks).
 
 ### 1. Fetch the architecture principles
 
-Try `gh` first. Fall back to MCP if `gh` is unavailable or returns an error (e.g., 404 may indicate missing authentication).
+Try `gh` first. Fall back to GitHub MCP if `gh` is unavailable or returns an error (e.g., 404 may indicate missing authentication).
 
 **Primary — `gh` CLI:**
 
