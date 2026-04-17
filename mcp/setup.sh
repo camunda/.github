@@ -163,6 +163,7 @@ install_claude_desktop() {
 
 install_gh_copilot() {
   command -v gh &>/dev/null || { error "GitHub CLI not found — install from https://cli.github.com"; return 1; }
+  gh copilot --help &>/dev/null || { error "GitHub Copilot CLI not found — install via: gh extension install github/gh-copilot"; return 1; }
   command -v jq &>/dev/null || { error "jq is required — install via: brew install jq (macOS) / apt install jq (Linux)"; return 1; }
 
   local target="$HOME/.copilot/mcp-config.json"
