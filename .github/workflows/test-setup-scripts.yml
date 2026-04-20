@@ -11,16 +11,16 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Ensure gh 2.90.0+
+      - uses: actions/checkout@v6
+      - name: Ensure gh-skill is available
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          gh --version
-          gh extension install gh-skill 2>/dev/null || true
           if ! gh skill --help >/dev/null 2>&1; then
-            curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
-            echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
-            sudo apt-get update && sudo apt-get install -y gh
+            GH_VER=$(curl -fsSL https://api.github.com/repos/cli/cli/releases/latest | grep -oP '"tag_name": "v\K[^"]+')
+            curl -fsSL "https://github.com/cli/cli/releases/download/v${GH_VER}/gh_${GH_VER}_linux_amd64.tar.gz" \
+              | tar -xz -C /tmp
+            sudo install -m755 "/tmp/gh_${GH_VER}_linux_amd64/bin/gh" /usr/local/bin/gh
           fi
-          gh --version
       - name: Run smoke tests
         run: ./tests/setup-scripts.sh
