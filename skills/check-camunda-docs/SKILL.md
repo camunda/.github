@@ -1,7 +1,7 @@
 ---
 name: check-camunda-docs
 description: Searches Camunda 8 documentation for domain knowledge needed during implementation. Use when a change involves Camunda-specific concepts, APIs, configuration, or behavior — such as BPMN, DMN, Zeebe, Connectors, Operate, Tasklist, Identity, or any Camunda platform component.
-compatibility: Requires the `camunda-docs` MCP server configured via camunda/.github/mcp/setup.sh
+compatibility: "No MCP server required; uses public docs search URLs."
 metadata:
   author: camunda
 ---
@@ -26,8 +26,11 @@ Identify the Camunda concepts relevant to the current change.
 
 ### 2. Search documentation
 
-Query the `camunda-docs` MCP server with a focused search term.
+Use the public Camunda Docs search route with a focused search term:
 
+- `https://docs.camunda.io/search/?q=<search-query>`
+  - `<search-query>` should be URL-encoded (percent-encoded); spaces to be encoded as `%20`.
+- Open and read the most relevant result pages directly from docs.camunda.io
 - Prefer specific terms over broad ones (e.g., "Zeebe gateway timeout configuration" over "Zeebe config")
 - If the first query returns insufficient results, refine and retry with alternative terms
 

@@ -75,7 +75,6 @@ if command -v jq &>/dev/null; then
   out=$($MCP --dry-run --vscode 2>&1) ; rc=$?
   assert_exit 0 "$rc" "--dry-run --vscode exits 0"
   assert_contains "Would merge" "$out" "--dry-run --vscode previews merge"
-  assert_contains "camunda-docs" "$out" "--dry-run --vscode includes camunda-docs"
 else
   echo "  ⊘ skipped --vscode tests (jq not installed)"
 fi

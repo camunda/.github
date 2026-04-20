@@ -21,7 +21,6 @@ Or pass flags directly:
 
 | MCP Server | Description | VS Code | Claude Code | Claude Desktop | JetBrains |
 |---|---|:---:|:---:|:---:|:---:|
-| `camunda-docs` | Camunda 8 documentation search via [kapa.ai](https://camunda-docs.mcp.kapa.ai) | ✔ | ✔ | ✔ | ✔ |
 | `github` | GitHub tools via [GitHub MCP Server](https://github.com/github/github-mcp-server) | ✔ | ✔ | ✔ | — |
 
 > **Note:** In VS Code the `github` MCP server authenticates via the Copilot extension. In Claude Code it requires a [GitHub Personal Access Token](https://github.com/settings/personal-access-tokens/new). In Claude Desktop, authenticate via Settings → Connectors.
