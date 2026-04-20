@@ -85,7 +85,7 @@ install_skill() {
   local agent="${2:-}"
   local label="${agent:-github-copilot}"
 
-  local cmd=(gh skill install "$SOURCE" "$skill")
+  local cmd=(gh skill install "$SOURCE" "$skill" --scope user)
   $SOURCE_IS_LOCAL && cmd+=(--from-local)
   if [[ -n "$agent" ]]; then
     cmd+=(--agent "$agent")
