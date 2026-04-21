@@ -1,5 +1,0 @@
-blank_issues_enabled: false
-contact_links:
-  - name: New Issue
-    url: https://github.com/camunda/ai-first-template/issues/new
-    about: Please create all issues in the ai-first-template repository.
