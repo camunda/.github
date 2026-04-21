@@ -1,5 +1,5 @@
 ---
-name: write-docs
+name: write-camunda-docs
 description: Writes documentation for the current code changes and raises a PR to camunda/camunda-docs — or updates an existing docs PR if one is already open for this branch.
 compatibility: Requires gh CLI with write access to camunda/camunda-docs
 metadata:
