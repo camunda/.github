@@ -110,19 +110,8 @@ install_claude() {
 
   if $DRY_RUN; then
     info "Would run:"
-    info "  claude mcp add --transport http --scope user camunda-docs https://camunda-docs.mcp.kapa.ai"
     info "  claude mcp add-json --scope user github '<config with GitHub PAT>'"
     return
-  fi
-
-  # camunda-docs — no auth required
-  local add_output
-  if add_output=$(claude mcp add --transport http --scope user camunda-docs https://camunda-docs.mcp.kapa.ai 2>&1); then
-    success "Claude: camunda-docs added"
-  elif [[ "$add_output" == *"already exists"* ]]; then
-    info "Claude: camunda-docs already configured (skipped)"
-  else
-    error "Claude: camunda-docs failed — $add_output"; return 1
   fi
 
   # github — requires a GitHub Personal Access Token
@@ -156,8 +145,6 @@ install_claude_desktop() {
   echo "  2. Go to Settings → Connectors"
   echo "  3. The following connectors already exist in your organization."
   echo "     Click \"Connect\" next to each one to enable it:"
-  echo ""
-  echo -e "     ${BOLD}Camunda Docs${NC}  (camunda-docs)"
   echo ""
   echo -e "     ${BOLD}GitHub${NC}  (github)"
   echo "       (Authenticate with your GitHub account when prompted)"
