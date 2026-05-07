@@ -28,6 +28,12 @@ Set up your local environment for AI-assisted development in two steps:
    ```
    See [`skills/README.md`](skills/README.md) for details.
 
+3. **Token-reduction tools** — cut context token usage
+   - **rtk** — CLI proxy compacting git/gh/ls/grep/test output, see [rtk-ai/rtk](https://github.com/rtk-ai/rtk#installation) for how to install.
+   - **caveman** — ultra-compressed assistant output mode, see [JuliusBrussee/caveman](https://github.com/JuliusBrussee/caveman#install) for how to install.
+
+   Verify: `rtk init -g` in terminal and `/caveman-help` inside Claude Code.
+
 ### Onboarding a Repository
 
 Follow the instructions in https://github.com/camunda/ai-first-template for how to onboard your repo for using this AI-First framework.
