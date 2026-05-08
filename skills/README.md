@@ -25,6 +25,7 @@ If you run `./setup.sh` from inside a git checkout that contains these skills, t
 |---|---|
 | `check-architecture-principles` | Validates structural/foundational changes against Camunda architecture principles |
 | `check-camunda-docs` | Searches Camunda 8 docs for domain knowledge needed during implementation |
+| `create-architecture-decision` | Creates an Architecture Decision Record (ADR) in Markdown format from a design discussion (e.g. Google Drive document, github issue) |
 
 ## Prerequisites
 
