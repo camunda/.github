@@ -1,13 +1,14 @@
 ---
-name: review-spec
+name: product-sense-review
 description: |
-  Review an engineering spec, design doc, or WIP RFC before implementation.
-  Applies a PM/architect lens, surfaces forks, gaps, dependencies, and
-  strategic-fit questions. Output is a structured review posted inline in
-  the conversation — does NOT write files to the working directory.
+  Review an engineering spec, design doc, or WIP RFC through a product-sense
+  lens — problem framing, user fit, product fit, and whether the spec is
+  framed clearly enough for the team to act on it. Use before implementation
+  begins, on work-in-progress specs. Output is a structured review posted
+  inline in the conversation — does NOT write files to the working directory.
   Triggers on: "review this spec", "review this RFC", "review this design",
-  "PM review", "spec review", a GitHub issue/PR link containing a spec body,
-  a Google Doc design doc link, or a pasted spec.
+  "PM review", "spec review", "product-sense review", a GitHub issue/PR link
+  containing a spec body, a Google Doc design doc link, or a pasted spec.
 
   Use when user: asks for a structured review of an engineering proposal
   before Define/build; needs to surface cross-product dependencies or
@@ -16,9 +17,9 @@ description: |
   on a colleague's spec.
 ---
 
-# Review an Engineering Spec
+# Product-Sense Review
 
-Review a work-in-progress engineering spec, design doc, or RFC. Make implicit things explicit, surface forks rather than block momentum, apply a PM/architect lens — *not* gatekeep ship-readiness.
+Review a work-in-progress engineering spec, design doc, or RFC through a product-sense lens. Make implicit things explicit, surface forks rather than block momentum — *not* gatekeep ship-readiness.
 
 The bar is not "is this complete." The bar is: **are we solving the right problem, in roughly the right way, with the right things made visible to the team?**
 
@@ -167,7 +168,7 @@ Use the priority markers `[Must]` / `[Should]` / `[Nit]` in front of every actio
 [Concrete follow-ups. Skip if none.]
 ```
 
-End the review with: *"Reply with feedback on this review and I'll refine it."*
+End the review with: *"Reply with feedback on this review and I'll capture it."*
 
 ## Camunda terminology to check against
 
