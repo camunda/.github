@@ -3,12 +3,15 @@ name: product-sense-review
 description: |
   Review an engineering spec, design doc, or WIP RFC through a product-sense
   lens — problem framing, user fit, product fit, and whether the spec is
-  framed clearly enough for the team to act on it. Use before implementation
-  begins, on work-in-progress specs. Output is a structured review posted
-  inline in the conversation — does NOT write files to the working directory.
-  Triggers on: "review this spec", "review this RFC", "review this design",
-  "PM review", "spec review", "product-sense review", a GitHub issue/PR link
-  containing a spec body, a Google Doc design doc link, or a pasted spec.
+  framed clearly enough for the team to act on it. Calibrates to the spec's
+  maturity stage (early direction, partial spec, ready-for-define) so
+  early-stage work gets direction feedback, not premature spec polish. Use
+  before implementation begins, on work-in-progress specs. Output is a
+  structured review posted inline in the conversation — does NOT write files
+  to the working directory. Triggers on: "review this spec", "review this
+  RFC", "review this design", "PM review", "spec review", "product-sense
+  review", a GitHub issue/PR link containing a spec body, a Google Doc
+  design doc link, or a pasted spec.
 
   Use when user: asks for a structured review of an engineering proposal
   before Define/build; needs to surface cross-product dependencies or
@@ -55,7 +58,20 @@ If the source can't be fetched, ask the user to paste it.
 
 Fetch the full content. Read fully before reviewing — skimming produces shallow reviews.
 
-### 2. Gather context (conditional)
+### 2. Read the spec's maturity stage
+
+Before reviewing, form a quick judgment on where the spec is in its lifecycle. Possible stages:
+
+- **Early direction** — problem sketched, no concrete design yet, alternatives not explored
+- **Partial spec** — direction crystallized, some design choices made, gaps in scope/edges/dependencies
+- **Ready-for-define** — design substantively complete, scope bounded, edges and dependencies visible
+- **Ready-for-implementation** — refined enough that engineers could start building
+
+This isn't a formal classification — it's a one-sentence judgment that calibrates the review. Signals to look for: presence or absence of concrete design, whether alternatives are considered, whether scope is bounded, whether edges and dependencies are even visible yet, whether the document reads as exploratory (*"we might…"*) or committed (*"we will…"*).
+
+If the spec is presented as more mature than it reads — e.g., framed as ready-for-define but actually closer to early direction — note this. That gap is itself important feedback and goes in the **Stage read** section of the output.
+
+### 3. Gather context (conditional)
 
 Only read sources that the spec actually touches. Don't dump findings; use context to inform the review and cite where relevant.
 
@@ -68,7 +84,7 @@ Only read sources that the spec actually touches. Don't dump findings; use conte
 | Camunda Docs (via `camunda-docs` MCP) | Current product state — what already ships, terminology, behavior reference |
 | Asana (Hub board), Google Drive, Figma, Company Handbook | Optional — read only if the corresponding MCP is configured and the spec calls for it |
 
-### 3. Confirm framing (only if needed)
+### 4. Confirm framing (only if needed)
 
 Ask only what you genuinely need answered. Skip any dimension that's obvious from the spec or context. If multiple are unclear, ask them together in one short message.
 
@@ -77,9 +93,9 @@ Candidate questions:
 - **Ambition**: What's the ambition level? *"Good enough"* vs. *"make-or-break for adoption"* changes the review depth.
 - **Focus**: Any specific area to push on, or a general review?
 
-If all are clear, skip step 3 entirely.
+If all are clear, skip step 4 entirely.
 
-### 4. Apply the review lens
+### 5. Apply the review lens
 
 Use the mandatory checks every time. Use the menu as a *menu* — pick 3–6 items that genuinely apply. Mentioning all of them is a failure mode; selectivity is the value.
 
@@ -116,7 +132,7 @@ Use the mandatory checks every time. Use the menu as a *menu* — pick 3–6 ite
 - **Deferred work, logged.** Deferring is fine. *Unlogged* deferring is the problem. If a deferral isn't captured (what, why safe now, future trigger), surface it.
 - **Out-of-box defaults.** Defaults rarely match real org structures. Ask what's customizable beyond them.
 
-### 5. Post the review
+### 6. Post the review
 
 Post the review directly in chat as your reply. **Do not write any files to the working directory.** The user decides where the review goes (GitHub comment, Slack, save manually).
 
@@ -129,8 +145,13 @@ Use the priority markers `[Must]` / `[Should]` / `[Nit]` in front of every actio
 **Source**: [link]
 **Lens applied**: [one line — what you covered and what you deliberately skipped]
 
-## TL;DR — Resolve before Define
-[List only the Must items, one line each with the one-line reason. If no Musts, write "No blockers." Aim for 3–6 max — more than that means the review is mis-prioritized.]
+## Stage read
+[One or two sentences naming the stage and the reasoning. Example: *"Reading this as an early direction — problem is sketched, but no concrete design and alternatives haven't been considered yet. At this stage, the most useful feedback is around problem framing, what alternatives might exist, and what would validate the direction cheaply. Leaving deferred-work logging and floor/ceiling questions aside since they're premature."*]
+
+[If the spec is presented as more mature than it reads, say so plainly here. Example: *"This is framed as ready-for-define, but reads closer to a partial spec — the design is sketched but scope, edges, and dependencies aren't yet visible. The main gaps to close before define are [X, Y, Z]."*]
+
+## TL;DR — Highest-leverage feedback
+[List only the Must items, one line each with the one-line reason. If no Musts, write "No blockers." Aim for 3–6 max — more than that means the review is mis-prioritized. At early-direction or partial-spec stage, Musts may be about direction or scope rather than define-readiness — that's fine; the stage read above sets the frame.]
 
 ## Summary
 [One paragraph: what this spec proposes, in your own words. If you can't summarize it, say so and point to what's muddled.]
@@ -186,6 +207,12 @@ Inline reference so the skill doesn't depend on an external file. Flag any of th
 
 These shape the *voice and method*, not just the content. Apply throughout.
 
+- **Match the review to the stage.** Don't apply ready-for-define principles to an early direction. Don't apply early-direction questions to a near-final spec. The lens (mandatory checks + menu) stays the same, but emphasis shifts by maturity:
+  - At **early direction**: weight problem framing, JTBD, alternatives considered, *"what would the cheapest validation look like,"* who else should weigh in. Skip deferred-work logging, floor-vs-ceiling, terminology landmines, and most framing-hygiene principles — they're premature.
+  - At **partial spec**: full "Is this the right thing?" lens, light "Is it framed well enough" lens. Push on what's missing from scope, edges, and dependencies before pushing on framing-clarity.
+  - At **ready-for-define / ready-for-implementation**: full lens, all principles in play.
+
+  If the spec's claimed maturity doesn't match its actual maturity, say so plainly in the **Stage read** section. That gap is the single most useful piece of feedback you can give.
 - **Walk through it like a user, in plain language.** When critiquing UX, narrate what a user would think on first encounter. Use parentheses for the internal monologue: *"(why is this greyed out? ah, because these aren't deleted, ok…)"*. If the feature requires the user to learn something to make sense of it, that's a flag.
 - **Concrete scenarios, with numbers and named entities.** Edge cases must be specific paths. *"A file deleted today, container deleted in 5 days"* beats *"time-handling could be confusing."*
 - **Vote when there's a choice.** State a ranked preference with a one-line reason. *"I vote A or B — A keeps it dumb and simple, B is a bit nicer."* No hedging.
