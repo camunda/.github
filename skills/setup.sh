@@ -238,7 +238,9 @@ interactive() {
     local tip_flags=""
     if $selected_all; then
       tip_flags=" --all"
-    else
+    elif $SOURCE_IS_LOCAL; then
+      # --agent only composes with --update from a local checkout; remote
+      # --update runs `gh skill update --all` and rejects --agent.
       for a in "${agents[@]}"; do
         [[ -n "$a" ]] && tip_flags+=" --agent $a"
       done
@@ -353,7 +355,9 @@ main() {
     local tip_flags=""
     if $install_all; then
       tip_flags=" --all"
-    else
+    elif $SOURCE_IS_LOCAL; then
+      # --agent only composes with --update from a local checkout; remote
+      # --update runs `gh skill update --all` and rejects --agent.
       for a in "${agents[@]}"; do
         [[ -n "$a" ]] && tip_flags+=" --agent $a"
       done
