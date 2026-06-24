@@ -24,6 +24,8 @@ warn()    { echo -e "${YELLOW}⚠${NC} $*"; }
 error()   { echo -e "${RED}✘${NC} $*" >&2; }
 
 DRY_RUN=false
+SKIPPED_ANY=false
+UPDATE=false
 
 SUPPORTED_AGENTS="claude-code cursor codex gemini"
 
@@ -101,6 +103,7 @@ install_skill() {
     success "$skill installed ($label)"
   elif [[ "$output" == *"already"* ]]; then
     info "$skill already installed ($label) (skipped)"
+    SKIPPED_ANY=true
   else
     error "$skill failed ($label) — $output"
     return 1
@@ -182,6 +185,12 @@ interactive() {
       install_skill "$skill" "$agent"
     done
   done
+
+  if $SKIPPED_ANY && ! $UPDATE; then
+    echo ""
+    info "Tip: run ./setup.sh --update to pull in the latest changes."
+    info "     Note: --update will overwrite existing skill files, including any local modifications."
+  fi
 
   echo ""
   if $DRY_RUN; then
@@ -270,6 +279,12 @@ main() {
       install_skill "$skill" "$agent"
     done
   done
+
+  if $SKIPPED_ANY && ! $UPDATE; then
+    echo ""
+    info "Tip: run ./setup.sh --update to pull in the latest changes."
+    info "     Note: --update will overwrite existing skill files, including any local modifications."
+  fi
 
   echo ""
   if $DRY_RUN; then
