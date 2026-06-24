@@ -3,7 +3,7 @@
 # Camunda Agent Skills Setup
 # Installs organization-wide agent skills into your local agent configuration.
 #
-# Usage: ./setup.sh [--agent <name>] [--all] [--dry-run] [-h|--help]
+# Usage: ./setup.sh [--agent <name>] [--all] [--update] [--dry-run] [-h|--help]
 #
 set -euo pipefail
 
