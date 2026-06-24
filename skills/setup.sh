@@ -209,8 +209,10 @@ interactive() {
   [[ "$choice" == [qQ] ]] && exit 0
 
   local agents=()
+  local selected_all=false
   if [[ "$choice" == [aA] ]]; then
     agents=("" "claude-code" "cursor" "codex" "gemini")
+    selected_all=true
   else
     IFS=',' read -ra sel <<< "$choice"
     for s in "${sel[@]}"; do
@@ -234,7 +236,7 @@ interactive() {
   if $SKIPPED_ANY && ! $UPDATE; then
     echo ""
     local tip_flags=""
-    if $install_all; then
+    if $selected_all; then
       tip_flags=" --all"
     else
       for a in "${agents[@]}"; do
