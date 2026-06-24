@@ -1,14 +1,7 @@
 ---
 name: create-architecture-decision
 description: |
-  Create an Architecture Decision Record (ADR) as a Markdown file.
-  Triggers on: "write an ADR", "capture this decision", "migrate this doc into an ADR",
-  architecture folder, decision records, ADR numbering/renumbering, and requests to
-  turn a Google Doc / kickoff note / conversation outcome into a durable decision record.
-
-  Use when user: asks to create or migrate an ADR, records a just-made architectural
-  decision, adds a decision to an existing ADR folder (e.g. docs/adrs/),
-  or needs to align a draft with the house ADR format.
+  Creates or migrates an Architecture Decision Record (ADR) as a Markdown file, including numbering and cross-referencing. Triggers on: "write an ADR", "capture this decision", "migrate this doc into an ADR", turning a Google Doc / kickoff note / conversation into a durable decision record, ADR numbering/renumbering, adding to an ADR or architecture folder (e.g. docs/adrs/), or aligning a draft with the house ADR format.
 ---
 
 # Create an Architecture Decision Record
