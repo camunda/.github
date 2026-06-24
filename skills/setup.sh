@@ -140,15 +140,15 @@ EOF
 # Update installed skills
 # ---------------------------------------------------------------------------
 update_skills() {
+  local agents=("$@")
   echo ""
   echo -e "${BOLD}Updating Camunda Agent Skills${NC}"
   echo ""
 
   if $SOURCE_IS_LOCAL; then
-    local all_agents=("" "claude-code" "cursor" "codex" "gemini")
     local skills
     read -ra skills <<< "$(discover_skills "$SOURCE")"
-    for agent in "${all_agents[@]}"; do
+    for agent in "${agents[@]}"; do
       local label="${agent:-github-copilot}"
       for skill in "${skills[@]}"; do
         local cmd=(gh skill install "$SOURCE" "$skill" --scope user --from-local --force)
@@ -233,7 +233,15 @@ interactive() {
 
   if $SKIPPED_ANY && ! $UPDATE; then
     echo ""
-    info "Tip: run ./setup.sh --update to pull in the latest changes."
+    local tip_flags=""
+    if $install_all; then
+      tip_flags=" --all"
+    else
+      for a in "${agents[@]}"; do
+        [[ -n "$a" ]] && tip_flags+=" --agent $a"
+      done
+    fi
+    info "Tip: run ./setup.sh --update${tip_flags} to pull in the latest changes."
     info "     Note: --update will overwrite existing skill files, including any local modifications."
   fi
 
@@ -293,8 +301,13 @@ main() {
     auto_detect_local_source || true
   fi
 
+  if $install_all; then
+    agents=("" "claude-code" "cursor" "codex" "gemini")
+  fi
+
   if $UPDATE; then
-    update_skills
+    [[ ${#agents[@]} -eq 0 ]] && agents=("" "claude-code" "cursor" "codex" "gemini")
+    update_skills "${agents[@]}"
     exit 0
   fi
 
@@ -318,10 +331,6 @@ main() {
     interactive; exit 0
   fi
 
-  if $install_all; then
-    agents=("" "claude-code" "cursor" "codex" "gemini")
-  fi
-
   # Default to Copilot if only --dry-run was passed
   [[ ${#agents[@]} -eq 0 ]] && agents+=("")
 
@@ -333,7 +342,11 @@ main() {
 
   if $SKIPPED_ANY && ! $UPDATE; then
     echo ""
-    info "Tip: run ./setup.sh --update to pull in the latest changes."
+    local tip_flags=""
+    for a in "${agents[@]}"; do
+      [[ -n "$a" ]] && tip_flags+=" --agent $a"
+    done
+    info "Tip: run ./setup.sh --update${tip_flags} to pull in the latest changes."
     info "     Note: --update will overwrite existing skill files, including any local modifications."
   fi
 
