@@ -38,9 +38,10 @@ If you run `./setup.sh` from inside a git checkout that contains these skills, t
 Skills are checked for freshness by the agent at the start of every session (see [AGENTS.md](../AGENTS.md#tooling-preconditions)). When updates are available, the agent will nudge you to run:
 
 ```bash
-./setup.sh --update                      # update for all agents
-./setup.sh --update --agent claude-code  # update for one agent only
+./setup.sh --update  # update for all agents
 ```
+
+When running from a local checkout, you can target a single agent: `./setup.sh --update --agent claude-code`.
 
 ## Adding a new skill
 
