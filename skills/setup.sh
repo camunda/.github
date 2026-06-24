@@ -124,6 +124,7 @@ Options:
   --agent <name>   Install for a specific agent (claude-code, cursor, codex, gemini)
                    Can be specified multiple times. Default: installs for GitHub Copilot.
   --all            Install for all supported agents
+  --update         Update all installed skills to their latest versions
   --dry-run        Show what would be done without installing
   -h, --help       Show this help message
 
@@ -133,6 +134,50 @@ Examples:
   ./setup.sh --all                    # All agents
   ./setup.sh --dry-run                # Preview
 EOF
+}
+
+# ---------------------------------------------------------------------------
+# Update installed skills
+# ---------------------------------------------------------------------------
+update_skills() {
+  echo ""
+  echo -e "${BOLD}Updating Camunda Agent Skills${NC}"
+  echo ""
+
+  if $SOURCE_IS_LOCAL; then
+    local all_agents=("" "claude-code" "cursor" "codex" "gemini")
+    local skills
+    read -ra skills <<< "$(discover_skills "$SOURCE")"
+    for agent in "${all_agents[@]}"; do
+      local label="${agent:-github-copilot}"
+      for skill in "${skills[@]}"; do
+        local cmd=(gh skill install "$SOURCE" "$skill" --scope user --from-local --force)
+        [[ -n "$agent" ]] && cmd+=(--agent "$agent")
+        if $DRY_RUN; then
+          info "Would run: ${cmd[*]}"
+        else
+          local output
+          if output=$("${cmd[@]}" 2>&1); then
+            success "$skill updated ($label)"
+          else
+            error "$skill failed ($label) — $output"
+            return 1
+          fi
+        fi
+      done
+    done
+  else
+    local cmd=(gh skill update --all)
+    $DRY_RUN && cmd+=(--dry-run)
+    "${cmd[@]}"
+  fi
+
+  echo ""
+  if $DRY_RUN; then
+    warn "Dry run — nothing was updated."
+  else
+    success "Done."
+  fi
 }
 
 interactive() {
@@ -216,6 +261,7 @@ main() {
         agents+=("$1")
         ;;
       --all)      install_all=true ;;
+      --update)   UPDATE=true ;;
       --dry-run)  DRY_RUN=true ;;
       -h|--help)  usage; exit 0 ;;
       *)          error "Unknown option: $1"; usage; exit 1 ;;
@@ -245,6 +291,11 @@ main() {
 
   if ! $SOURCE_IS_LOCAL; then
     auto_detect_local_source || true
+  fi
+
+  if $UPDATE; then
+    update_skills
+    exit 0
   fi
 
   if $SOURCE_IS_LOCAL; then
