@@ -345,9 +345,13 @@ main() {
   if $SKIPPED_ANY && ! $UPDATE; then
     echo ""
     local tip_flags=""
-    for a in "${agents[@]}"; do
-      [[ -n "$a" ]] && tip_flags+=" --agent $a"
-    done
+    if $install_all; then
+      tip_flags=" --all"
+    else
+      for a in "${agents[@]}"; do
+        [[ -n "$a" ]] && tip_flags+=" --agent $a"
+      done
+    fi
     info "Tip: run ./setup.sh --update${tip_flags} to pull in the latest changes."
     info "     Note: --update will overwrite existing skill files, including any local modifications."
   fi
