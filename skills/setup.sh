@@ -258,6 +258,7 @@ interactive() {
 main() {
   local agents=()
   local install_all=false
+  local agents_explicit=false
 
   while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -269,6 +270,7 @@ main() {
           exit 1
         fi
         agents+=("$1")
+        agents_explicit=true
         ;;
       --all)      install_all=true ;;
       --update)   UPDATE=true ;;
@@ -308,6 +310,10 @@ main() {
   fi
 
   if $UPDATE; then
+    if $agents_explicit && ! $SOURCE_IS_LOCAL; then
+      error "--agent is not supported for remote updates; omit --agent, or run from a local checkout"
+      exit 1
+    fi
     [[ ${#agents[@]} -eq 0 ]] && agents=("" "claude-code" "cursor" "codex" "gemini")
     update_skills "${agents[@]}"
     exit 0
