@@ -24,7 +24,8 @@ Set up your local environment for AI-assisted development in two steps:
 
 2. **Agent skills** — give agents Camunda-specific capabilities
    ```bash
-   cd skills && ./setup.sh
+   cd skills && ./setup.sh           # install
+   cd skills && ./setup.sh --update  # update to latest
    ```
    See [`skills/README.md`](skills/README.md) for details.
 

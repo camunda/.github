@@ -3,7 +3,7 @@
 # Camunda Agent Skills Setup
 # Installs organization-wide agent skills into your local agent configuration.
 #
-# Usage: ./setup.sh [--agent <name>] [--all] [--dry-run] [-h|--help]
+# Usage: ./setup.sh [--agent <name>] [--all] [--update] [--dry-run] [-h|--help]
 #
 set -euo pipefail
 
@@ -24,6 +24,8 @@ warn()    { echo -e "${YELLOW}⚠${NC} $*"; }
 error()   { echo -e "${RED}✘${NC} $*" >&2; }
 
 DRY_RUN=false
+SKIPPED_ANY=false
+UPDATE=false
 
 SUPPORTED_AGENTS="claude-code cursor codex gemini"
 
@@ -101,6 +103,7 @@ install_skill() {
     success "$skill installed ($label)"
   elif [[ "$output" == *"already"* ]]; then
     info "$skill already installed ($label) (skipped)"
+    SKIPPED_ANY=true
   else
     error "$skill failed ($label) — $output"
     return 1
@@ -121,6 +124,7 @@ Options:
   --agent <name>   Install for a specific agent (claude-code, cursor, codex, gemini)
                    Can be specified multiple times. Default: installs for GitHub Copilot.
   --all            Install for all supported agents
+  --update         Update all installed skills to their latest versions
   --dry-run        Show what would be done without installing
   -h, --help       Show this help message
 
@@ -130,6 +134,50 @@ Examples:
   ./setup.sh --all                    # All agents
   ./setup.sh --dry-run                # Preview
 EOF
+}
+
+# ---------------------------------------------------------------------------
+# Update installed skills
+# ---------------------------------------------------------------------------
+update_skills() {
+  local agents=("$@")
+  echo ""
+  echo -e "${BOLD}Updating Camunda Agent Skills${NC}"
+  echo ""
+
+  if $SOURCE_IS_LOCAL; then
+    local skills
+    read -ra skills <<< "$(discover_skills "$SOURCE")"
+    for agent in "${agents[@]}"; do
+      local label="${agent:-github-copilot}"
+      for skill in "${skills[@]}"; do
+        local cmd=(gh skill install "$SOURCE" "$skill" --scope user --from-local --force)
+        [[ -n "$agent" ]] && cmd+=(--agent "$agent")
+        if $DRY_RUN; then
+          info "Would run: ${cmd[*]}"
+        else
+          local output
+          if output=$("${cmd[@]}" 2>&1); then
+            success "$skill updated ($label)"
+          else
+            error "$skill failed ($label) — $output"
+            return 1
+          fi
+        fi
+      done
+    done
+  else
+    local cmd=(gh skill update --all)
+    $DRY_RUN && cmd+=(--dry-run)
+    "${cmd[@]}"
+  fi
+
+  echo ""
+  if $DRY_RUN; then
+    warn "Dry run — nothing was updated."
+  else
+    success "Done."
+  fi
 }
 
 interactive() {
@@ -161,8 +209,10 @@ interactive() {
   [[ "$choice" == [qQ] ]] && exit 0
 
   local agents=()
+  local selected_all=false
   if [[ "$choice" == [aA] ]]; then
     agents=("" "claude-code" "cursor" "codex" "gemini")
+    selected_all=true
   else
     IFS=',' read -ra sel <<< "$choice"
     for s in "${sel[@]}"; do
@@ -183,6 +233,22 @@ interactive() {
     done
   done
 
+  if $SKIPPED_ANY && ! $UPDATE; then
+    echo ""
+    local tip_flags=""
+    if $selected_all; then
+      tip_flags=" --all"
+    elif $SOURCE_IS_LOCAL; then
+      # --agent only composes with --update from a local checkout; remote
+      # --update runs `gh skill update --all` and rejects --agent.
+      for a in "${agents[@]}"; do
+        [[ -n "$a" ]] && tip_flags+=" --agent $a"
+      done
+    fi
+    info "Tip: run ./setup.sh --update${tip_flags} to pull in the latest changes."
+    info "     Note: --update will overwrite existing skill files, including any local modifications."
+  fi
+
   echo ""
   if $DRY_RUN; then
     warn "Dry run — nothing was installed."
@@ -194,6 +260,7 @@ interactive() {
 main() {
   local agents=()
   local install_all=false
+  local agents_explicit=false
 
   while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -205,8 +272,10 @@ main() {
           exit 1
         fi
         agents+=("$1")
+        agents_explicit=true
         ;;
       --all)      install_all=true ;;
+      --update)   UPDATE=true ;;
       --dry-run)  DRY_RUN=true ;;
       -h|--help)  usage; exit 0 ;;
       *)          error "Unknown option: $1"; usage; exit 1 ;;
@@ -238,6 +307,20 @@ main() {
     auto_detect_local_source || true
   fi
 
+  if $install_all; then
+    agents=("" "claude-code" "cursor" "codex" "gemini")
+  fi
+
+  if $UPDATE; then
+    if $agents_explicit && ! $SOURCE_IS_LOCAL; then
+      error "--agent is not supported for remote updates; omit --agent, or run from a local checkout"
+      exit 1
+    fi
+    [[ ${#agents[@]} -eq 0 ]] && agents=("" "claude-code" "cursor" "codex" "gemini")
+    update_skills "${agents[@]}"
+    exit 0
+  fi
+
   if $SOURCE_IS_LOCAL; then
     [[ -d "$SOURCE" ]] || { error "Local source directory not found: $SOURCE"; exit 1; }
   fi
@@ -258,10 +341,6 @@ main() {
     interactive; exit 0
   fi
 
-  if $install_all; then
-    agents=("" "claude-code" "cursor" "codex" "gemini")
-  fi
-
   # Default to Copilot if only --dry-run was passed
   [[ ${#agents[@]} -eq 0 ]] && agents+=("")
 
@@ -270,6 +349,22 @@ main() {
       install_skill "$skill" "$agent"
     done
   done
+
+  if $SKIPPED_ANY && ! $UPDATE; then
+    echo ""
+    local tip_flags=""
+    if $install_all; then
+      tip_flags=" --all"
+    elif $SOURCE_IS_LOCAL; then
+      # --agent only composes with --update from a local checkout; remote
+      # --update runs `gh skill update --all` and rejects --agent.
+      for a in "${agents[@]}"; do
+        [[ -n "$a" ]] && tip_flags+=" --agent $a"
+      done
+    fi
+    info "Tip: run ./setup.sh --update${tip_flags} to pull in the latest changes."
+    info "     Note: --update will overwrite existing skill files, including any local modifications."
+  fi
 
   echo ""
   if $DRY_RUN; then
