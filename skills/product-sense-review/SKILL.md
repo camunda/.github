@@ -1,7 +1,7 @@
 ---
 name: product-sense-review
 description: |
-  Reviews an engineering spec, design doc, or RFC through a product-sense lens — problem framing, user fit, product fit, spec clarity — calibrated to the spec's maturity stage. Posts a structured review inline; never writes files. Triggers on: "review this spec", "review this RFC", "review this design", "PM review", "spec review", "product-sense review", a second opinion on a colleague's spec, a pasted spec, or a GitHub/Google Doc spec link.
+  Reviews an engineering spec, design doc, or RFC through a product-sense lens — problem framing, user fit, product fit, cross-product dependencies, spec clarity — calibrated to the spec's maturity stage, before Define/build. Posts a structured review inline; never writes files. Triggers on: "review this spec", "review this RFC", "review this design", "PM review", "spec review", "product-sense review", a second opinion on a colleague's spec, a pasted spec, or a GitHub/Google Doc spec link.
 ---
 
 # Product-Sense Review
