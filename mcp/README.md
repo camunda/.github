@@ -7,7 +7,7 @@ in [camunda/actora](https://github.com/camunda/actora).
 For Claude Code, run `/gear-up` (or the skill's bundled `scripts/setup-mcp.sh`) to configure the
 `github` MCP server:
 
-```
+```bash
 claude plugin marketplace add camunda/actora
 claude plugin install gear-up@actora
 ```
