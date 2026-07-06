@@ -16,20 +16,15 @@
 
 Set up your local environment for AI-assisted development in two steps:
 
-1. **MCP servers** — give agents access to Camunda docs and GitHub tools
+1. **MCP servers and agent skills** — give agents access to Camunda docs, GitHub tools, and Camunda-specific capabilities via [camunda/actora](https://github.com/camunda/actora)
    ```bash
-   cd mcp && ./setup.sh
+   claude plugin marketplace add camunda/actora
+   claude plugin install gear-up@actora
    ```
-   See [`mcp/README.md`](mcp/README.md) for details.
+   Then run `/gear-up` in a Claude Code session to complete the setup.
+   See [`mcp/README.md`](mcp/README.md) and [`skills/README.md`](skills/README.md) for details.
 
-2. **Agent skills** — give agents Camunda-specific capabilities
-   ```bash
-   cd skills && ./setup.sh           # install
-   cd skills && ./setup.sh --update  # update to latest
-   ```
-   See [`skills/README.md`](skills/README.md) for details.
-
-3. **Token-reduction tools** — cut context token usage
+2. **Token-reduction tools** — cut context token usage
    - **rtk** — CLI proxy compacting git/gh/ls/grep/test output, see [rtk-ai/rtk](https://github.com/rtk-ai/rtk#installation) for how to install.
    - **caveman** — ultra-compressed assistant output mode, see [JuliusBrussee/caveman](https://github.com/JuliusBrussee/caveman#install) for how to install.
 
