@@ -101,7 +101,7 @@ Every ADR file follows this structure. Match it exactly — readers and tooling 
 ## Decision
 
 **D1. <Decision, phrased as a short declarative headline.>**
-<One short paragraph elaborating the decision — just enough that a reader understands what is being committed to.>
+<One short paragraph elaborating the decision — just enough that a reader understands what is being committed to and why it was decided this way.>
 
 **D2. <Next decision.>**
 <Elaboration.>
@@ -131,7 +131,7 @@ Optional. Include this section only when there are architectural-level alternati
 ## House style
 
 - **Context**: problem + outcome. No process narration. No "we considered X, Y, Z and chose Y because…" — that belongs in Alternatives considered.
-- **Decisions**: headline in bold with `D<n>.` prefix. Body is one short paragraph at most. The body should describe the decision, not the reasoning for choosing it over alternatives — that reasoning belongs in Alternatives considered.
+- **Decisions**: headline in bold with `D<n>.` prefix. Body is one short paragraph at most: the decision plus a sentence or two of rationale, so a future reader understands why each decision was made carefully, not just what it is. Comparative reasoning against other options belongs in Alternatives considered, not in the body.
 - **Alternatives considered**: each bullet is a short bold headline plus one or two sentences of rejection rationale. Keep the focus on the architectural trade-off that tipped the decision; do not catalogue every variant the source discussed.
 - **No customer names.** Never reference a specific customer by name, even when the source does. Generalize to "some customers", "existing Console SM customers", "customers with a git-based workflow", etc. This applies to Context, Decisions, Alternatives considered, Consequences, and Sources alike.
 - **One ADR per coherent decision bundle.** If two decisions always travel together (e.g. "use a monorepo" and "with Turborepo"), bundle them. If they can stand independently, split them.
