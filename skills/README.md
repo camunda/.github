@@ -1,51 +1,19 @@
-# Camunda Agent Skills
+# Moved to actora
 
-This directory contains organization-wide [Agent Skills](https://agentskills.io) that extend AI coding agents with Camunda-specific capabilities.
+The Camunda agent skills that used to live here (check-architecture-principles, check-camunda-docs,
+create-architecture-decision, product-sense-review, write-camunda-docs) have moved to
+[camunda/actora](https://github.com/camunda/actora/tree/main/functions/engineering/skills), the
+Camunda skills marketplace — one Claude Code plugin each.
 
-## Quick start
+Install them from the actora marketplace:
 
-```bash
-git clone https://github.com/camunda/.github.git
-cd .github/skills
-./setup.sh              # interactive — choose which agents to configure
+```
+claude plugin marketplace add camunda/actora
+claude plugin install <skill>@actora
 ```
 
-Or pass flags directly:
+Or let the [gear-up skill](https://github.com/camunda/actora/tree/main/functions/engineering/skills/gear-up)
+set up your whole workstation: `claude plugin install gear-up@actora`, then `/gear-up` in a session.
 
-```bash
-./setup.sh --agent claude-code    # Claude Code only
-./setup.sh --all                  # all supported agents
-```
-
-If you run `./setup.sh` from inside a git checkout that contains these skills, the script automatically installs from that local checkout.
-
-## Available skills
-
-| Skill | Description |
-|---|---|
-| `check-architecture-principles` | Validates structural/foundational changes against Camunda architecture principles |
-| `check-camunda-docs` | Searches Camunda 8 docs for domain knowledge needed during implementation |
-| `create-architecture-decision` | Creates an Architecture Decision Record (ADR) in Markdown format from a design discussion (e.g. Google Drive document, github issue) |
-| `product-sense-review` | Reviews a WIP engineering spec, design doc, or RFC through a product-sense lens — problem framing, user fit, product fit, and framing for the team to act on. Posts review inline in chat; writes no files. |
-
-## Prerequisites
-
-- **GitHub CLI** v2.90.0+ with the `gh skill` extension
-- **MCP servers** configured via [`mcp/setup.sh`](../mcp/README.md) — the skills depend on the `github` and `camunda-docs` MCP servers
-
-## Keeping skills up to date
-
-Skills are checked for freshness by the agent at the start of every session (see [AGENTS.md](../AGENTS.md#tooling-preconditions)). When updates are available, the agent will nudge you to run:
-
-```bash
-./setup.sh --update  # update for all agents
-```
-
-When running from a local checkout, you can target a single agent: `./setup.sh --update --agent claude-code`.
-
-## Adding a new skill
-
-1. Create a new directory under `skills/` matching the skill name (lowercase, hyphens only).
-2. Add a `SKILL.md` with the required frontmatter (`name`, `description`) and instructions.
-3. Update the table above.
-4. Commit — others can then install via `gh skill install camunda/.github <skill-name>`.
+Previously installed copies via `gh skill` are no longer updated — uninstall them and switch to the
+actora plugins.
