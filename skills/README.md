@@ -7,7 +7,7 @@ Camunda skills marketplace — one Claude Code plugin each.
 
 Install them from the actora marketplace:
 
-```
+```bash
 claude plugin marketplace add camunda/actora
 claude plugin install <skill>@actora
 ```
