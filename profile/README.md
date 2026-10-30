@@ -1,6 +1,6 @@
 # Camunda
 
-[Camunda](https://camunda.com) offers a scalable platform for process orchestration and automation, used by developers and enterprises worldwide. Design and run end-to-end processes that combine deterministic workflows with dynamic agentic orchestration—spanning people, systems, and AI agents—on our SaaS, in your cloud, or on-premises.
+[Camunda](https://camunda.com) offers a scalable agentic orchestration platform, used by developers and enterprises worldwide. Build AI agents, and design and run end-to-end processes that combine deterministic workflows with dynamic agentic orchestration across people, systems, and AI agents. Run them on Camunda SaaS, or Self-Managed in your own cloud or on-premises. Built for the enterprise, with the security, compliance, availability, and scale that mission-critical processes need.
 
 ## Camunda 8
 
